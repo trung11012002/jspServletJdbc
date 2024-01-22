@@ -12,7 +12,7 @@ import com.laptrinhjavaweb.dao.ICategoryDAO;
 import com.laptrinhjavaweb.model.CategoryModel;
 import com.mysql.cj.protocol.Resultset;
 
-public class CategoryDAO implements ICategoryDAO {
+public class CategoryDAO extends AbstractDAO<CategoryModel> implements ICategoryDAO {
 
 	public Connection getConnection() {
 		try {
