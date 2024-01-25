@@ -11,7 +11,7 @@ import java.util.List;
 import com.laptrinhjavaweb.dao.GenericDAO;
 import com.laptrinhjavaweb.mapper.RowMapper;
 
-public class AbstractDAO <T> implements GenericDAO <T>{
+public class AbstractDAO<T> implements GenericDAO<T> {
 	public Connection getConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -33,13 +33,46 @@ public class AbstractDAO <T> implements GenericDAO <T>{
 		try {
 			connection = getConnection();
 			statement = connection.prepareStatement(sql);
-			//set parameters ()
+			// set parameters ()
+			setParameters(statement, parameters);
 			resultSet = statement.executeQuery();
 			while (resultSet.next()) {
-				results.add(e);
+				results.add(rowMapper.mapRow(resultSet));
 			}
+			return results;
 		} catch (SQLException e) {
 			return null;
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (statement != null) {
+					statement.close();
+				}
+				if (resultSet != null) {
+					resultSet.close();
+				}
+			} catch (SQLException e) {
+				return null;
+			}
+		}
+	}
+
+	private void setParameters(PreparedStatement statement, Object... parameters) {
+
+		try {
+			for (int i = 0; i < parameters.length; i++) {
+				Object parameter = parameters[i];
+				int index = i + 1;
+				if (parameter instanceof Long) {
+					statement.setLong(index, (Long) (parameter));
+				}else if (parameter instanceof String) {
+					statement.setString(index , (String) parameter);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }
